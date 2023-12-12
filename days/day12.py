@@ -17,22 +17,7 @@ def part_one(data):
         springs, groups = line.split(" ")
         groups = [int(n) for n in groups.split(",")]
 
-        arr = [[0 for _ in springs] for _ in groups]
-
-        for k, group in enumerate(groups):
-            if k == 0:
-                for i in range(len(arr[0])):
-                    arr[0][i] = int(check_damaged(springs, i - group + 1, group) and check_operational(springs, 0, i - group + 1))
-                continue
-
-            for i in range(len(arr[k])):
-                for j in range(i - group):
-                    if check_damaged(springs, i - group + 1, group) and check_operational(springs, j + 1, i - j - group):
-                        arr[k][i] += arr[k - 1][j]
-
-        for i in range(len(arr[-1])):
-            if arr[-1][i] and check_operational(springs, i + 1, len(arr[-1]) - i - 1):
-                res += arr[-1][i]
+        res += solve_line(springs, groups)
 
     return res
 
@@ -46,24 +31,31 @@ def part_two(data):
         for _ in range(4):
             springs = springs + "?" + springs1
 
-        arr = [[0 for _ in springs] for _ in groups]
+        res += solve_line(springs, groups)
 
-        for k, group in enumerate(groups):
-            if k == 0:
-                for i in range(len(arr[0])):
-                    arr[0][i] = int(
-                        check_damaged(springs, i - group + 1, group) and check_operational(springs, 0, i - group + 1))
-                continue
+    return res
 
-            for i in range(len(arr[k])):
-                for j in range(i - group):
-                    if check_damaged(springs, i - group + 1, group) and check_operational(springs, j + 1,
-                                                                                          i - j - group):
-                        arr[k][i] += arr[k - 1][j]
 
-        for i in range(len(arr[-1])):
-            if arr[-1][i] and check_operational(springs, i + 1, len(arr[-1]) - i - 1):
-                res += arr[-1][i]
+def solve_line(springs, groups):
+    arr = [[0 for _ in springs] for _ in groups]
+
+    for k, group in enumerate(groups):
+        if k == 0:
+            for i in range(len(arr[0])):
+                arr[0][i] = int(
+                    check_damaged(springs, i - group + 1, group) and check_operational(springs, 0, i - group + 1))
+            continue
+
+        for i in range(len(arr[k])):
+            for j in range(i - group):
+                if (check_damaged(springs, i - group + 1, group)
+                        and check_operational(springs, j + 1, i - j - group)):
+                    arr[k][i] += arr[k - 1][j]
+
+    res = 0
+    for i in range(len(arr[-1])):
+        if arr[-1][i] and check_operational(springs, i + 1, len(arr[-1]) - i - 1):
+            res += arr[-1][i]
 
     return res
 
